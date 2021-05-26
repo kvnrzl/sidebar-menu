@@ -16,18 +16,29 @@ class _SideBarMenuState extends State<SideBarMenu>
   bool isCollapsed = true;
   double screenHeight, screenWidth;
   final Duration duration = const Duration(milliseconds: 300);
+  PageController _pageController = PageController(viewportFraction: 0.8);
+  // double currentPageValue;
   AnimationController _controller;
   Animation<double> _scaleAnimation;
-  // Animation<Offset> _slideAnimation;
+  Animation<double> _sideMenuScaleAnimation;
+  Animation<Offset> _sideMenuSlideAnimation;
 
   @override
   void initState() {
     super.initState();
     CardHelper cardObj = CardHelper();
     listOfCard = cardObj.getCard();
+    // _pageController.addListener(() {
+    //   currentPageValue = _pageController.page;
+    // });
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     _scaleAnimation = Tween<double>(begin: 1, end: 0.8).animate(_controller);
+    _sideMenuScaleAnimation =
+        Tween<double>(begin: 0.5, end: 1).animate(_controller);
+    _sideMenuSlideAnimation =
+        Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0))
+            .animate(_controller);
   }
 
   @override
@@ -56,51 +67,57 @@ class _SideBarMenuState extends State<SideBarMenu>
   }
 
   Widget sideMenuWidget(context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 24),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Column(
-          // mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.water_damage_sharp, color: Colors.grey),
-              label: Text('Dashboard',
-                  style:
-                      GoogleFonts.poppins(fontSize: 20, color: Colors.white)),
+    return SlideTransition(
+      position: _sideMenuSlideAnimation,
+      child: ScaleTransition(
+        scale: _sideMenuScaleAnimation,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 24),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              // mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.water_damage_sharp, color: Colors.grey),
+                  label: Text('Dashboard',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20, color: Colors.white)),
+                ),
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.message_sharp, color: Colors.grey),
+                  label: Text('Messages',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20, color: Colors.white)),
+                ),
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.payment_sharp, color: Colors.grey),
+                  label: Text('Utility Bills',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20, color: Colors.white)),
+                ),
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.send_to_mobile, color: Colors.grey),
+                  label: Text('Funds Transfer',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20, color: Colors.white)),
+                ),
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.dashboard_sharp, color: Colors.grey),
+                  label: Text('Branches',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20, color: Colors.white)),
+                ),
+              ],
             ),
-            TextButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.message_sharp, color: Colors.grey),
-              label: Text('Messages',
-                  style:
-                      GoogleFonts.poppins(fontSize: 20, color: Colors.white)),
-            ),
-            TextButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.payment_sharp, color: Colors.grey),
-              label: Text('Utility Bills',
-                  style:
-                      GoogleFonts.poppins(fontSize: 20, color: Colors.white)),
-            ),
-            TextButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.send_to_mobile, color: Colors.grey),
-              label: Text('Funds Transfer',
-                  style:
-                      GoogleFonts.poppins(fontSize: 20, color: Colors.white)),
-            ),
-            TextButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.dashboard_sharp, color: Colors.grey),
-              label: Text('Branches',
-                  style:
-                      GoogleFonts.poppins(fontSize: 20, color: Colors.white)),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -167,9 +184,12 @@ class _SideBarMenuState extends State<SideBarMenu>
                     height: 200,
                     margin: EdgeInsetsDirectional.only(top: 48),
                     child: PageView.builder(
-                      controller: PageController(viewportFraction: 0.8),
+                      controller: _pageController,
                       itemCount: listOfCard.length,
                       itemBuilder: (context, index) {
+                        // double difference = index - currentPageValue;
+                        // if (difference < 0) difference *= -1;
+                        // difference = min(1, difference);
                         return ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Stack(
@@ -204,11 +224,46 @@ class _SideBarMenuState extends State<SideBarMenu>
                       },
                     ),
                   ),
-                  Text(
-                    "Transaction",
-                    style:
-                        GoogleFonts.poppins(color: Colors.white, fontSize: 20),
-                  )
+                  SizedBox(height: 48),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Transaction",
+                        style: GoogleFonts.poppins(
+                            color: Colors.white, fontSize: 20),
+                      ),
+                      Icon(
+                        Icons.settings_backup_restore,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24),
+                  ListView.separated(
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                            'Buy Merchant',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            'Tokopedia',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          trailing: Text(
+                            'Rp121.000',
+                            style: GoogleFonts.poppins(color: Colors.red[600]),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return Divider(
+                          height: 16,
+                        );
+                      },
+                      itemCount: 15)
                 ],
               ),
             ),
